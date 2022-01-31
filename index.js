@@ -10,7 +10,7 @@ app.use(cors())
 const schema = buildASTSchema(gql`
   type Query {
     move(id: ID): Move
-    person(user: String): Person
+    person(userName: String): Person
     game(id: ID): Game
   }
 
@@ -58,6 +58,18 @@ const schema = buildASTSchema(gql`
     value: String
     up: Boolean
   }
+
+  // type Mutation {
+  //   newPlayer(input: PersonInput!): Person
+  // }
+
+  // input PersonInput {
+  //   id: ID
+  //   userName: String
+  //   firstName: String
+  //   lastName: String
+  // }
+
 `)
 
 const PEOPLE = new Map()
@@ -97,10 +109,19 @@ const setup_fake_data = () => {
 
 setup_fake_data();
 
+//resolvers
 const rootValue = {
     move: ({id}) => MOVES.get(id),
-    person: ({username}) => PEOPLE.get(username),
+    person: ({userName}) => PEOPLE.get(userName),
     game: ({id}) => GAMES.get(id),
+    // newPlayer: async ({input}, {headers}) => {
+    // 	//do authentication/authorization ...
+
+    // 	PEOPLE.set( input.userName, {id: input.id, userName: input.userName, firstName: input.firstName, lastName: input.lastName, games: []})
+    // 	// or save to db
+
+    // 	return PEOPLE.get(input.userName)
+    // }
 }
 
 app.use('/graphql', graphqlHTTP({ schema, rootValue }))
@@ -108,4 +129,3 @@ app.use('/graphql', graphqlHTTP({ schema, rootValue }))
 const port = process.env.PORT || 8080
 app.listen(port)
 console.log(`Running a GraphQL API server at http://localhost:${port}/graphql`)
- 
